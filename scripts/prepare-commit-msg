@@ -11,7 +11,6 @@ $verbose_prefix = "git hook: "
 regex_commit_issue_number = PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER
 regex_branch_issue_number = PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER
 regex_git_commit_messages = PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES
-
 # colorize strings in console output
 class String
 	def error;   "\e[31m#{self}\e[0m" end
@@ -62,7 +61,7 @@ if !issue_number
 end
 
 # combine to new message
-new_commit_message = "[#{issue_number.upcase}] #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
+new_commit_message = "PLACEHOLDER_NEW_COMMIT_MESSAGE"
 
 # write new commit message to file
 File.open(commit_file, 'w') do |f|

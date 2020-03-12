@@ -1,12 +1,11 @@
 #!/bin/sh
 
 # defaults
-PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER="^\s*\[[\-\w]*\d\]"
+PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER="^\s*[\-\w]*\d:"
 PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER="[.]*\/([\-\w]*?\-\d+)"
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES="(Merge\sbranch\s\'|\#\sRebase\s|This\sreverts\scommit\s)"
 PLACEHOLDER_LOGGING_VERBOSE="true"
-
-GITHUB_SCRIPT_URL="https://raw.githubusercontent.com/janniks/prepare-commit-msg/master/scripts/prepare-commit-msg"
+PLACEHOLDER_NEW_COMMIT_MESSAGE="#{issue_number.upcase}: #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
 
 PATH_GIT_GLOBAL="${HOME}/.git-template/"
 PATH_GIT_LOCAL="./.git/"
@@ -125,7 +124,7 @@ if [ "$OPTION_GLOBAL_TEMPLATE" = true ]; then
 	    printf -- " - A global \'${BLUE}${HOOK_NAME}${RESET}\' git hook already exists. ${RED}Aborting...${RESET}\n\n"
 	    exit
 	fi
-    
+
 	HOOK_FILE="${PATH_GIT_GLOBAL}${HOOK_DIR}${HOOK_NAME}"
 
 	printf -- " - Setting global git-template...\n"
@@ -140,8 +139,10 @@ else
 	HOOK_FILE="${PATH_GIT_LOCAL}${HOOK_DIR}${HOOK_NAME}"
 fi
 
-printf -- " - Downloading git hook...\n"
-curl -s "$GITHUB_SCRIPT_URL" > "$HOOK_FILE"
+printf -- " - Creating git hook file\n"
+
+BASEDIR=$(dirname $0)
+cat "${BASEDIR}/prepare-commit-msg" > "$HOOK_FILE"
 
 printf -- " - Replacing placeholders...\n"
 PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=$(printf -- "$PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER" | sed 's/\\/\\\\/g')
@@ -153,11 +154,13 @@ PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER=$(printf -- "$PLACEHOLDER_REGEX_BRANCH_ISS
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES=$(printf -- "$PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES" | sed 's/\\/\\\\/g')
 printf -v PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES "%q" "$PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES"
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES=$(printf -- "$PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES" | sed 's/\//\\\//g')
+PLACEHOLDER_NEW_COMMIT_MESSAGE=$(printf -- "$PLACEHOLDER_NEW_COMMIT_MESSAGE" | sed 's/\//\\\//g')
 
 sed -i '' "s/PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER/\/${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER}\//g" "$HOOK_FILE"
 sed -i '' "s/PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER/\/${PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER}\//g" "$HOOK_FILE"
 sed -i '' "s/PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES/\/${PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES}\//g" "$HOOK_FILE"
 sed -i '' "s/PLACEHOLDER_LOGGING_VERBOSE/${PLACEHOLDER_LOGGING_VERBOSE}/g" "$HOOK_FILE"
+sed -i '' "s/PLACEHOLDER_NEW_COMMIT_MESSAGE/${PLACEHOLDER_NEW_COMMIT_MESSAGE}/g" "$HOOK_FILE"
 
 printf -- " - Requesting permission to execute git hook...\n"
 chmod a+x "$HOOK_FILE"
