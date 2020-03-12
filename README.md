@@ -15,7 +15,7 @@ This git hook requires `ruby`  to be installed _(already pre-installed by defaul
 To install simply run the following command. This requires `curl` to be installed.
 
 ```bash
-sh <(curl -s https://raw.githubusercontent.com/janniks/prepare-commit-msg/master/scripts/install.sh)
+sh <(curl -s https://raw.githubusercontent.com/yrave/prepare-commit-msg/master/scripts/install.sh)
 ```
 
 > If you choose the option to install globally, you will have to reinitialize all your git repositories. The following helpful command reinitializes all repositories found in sub-directories of the current directory.
