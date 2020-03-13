@@ -1,11 +1,13 @@
 #!/bin/sh
 
+should_use_file_from_github_url=true
 # defaults
 PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER="^\s*[\-\w]*\d:"
 PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER="[.]*\/([\-\w]*?\-\d+)"
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES="(Merge\sbranch\s\'|\#\sRebase\s|This\sreverts\scommit\s)"
 PLACEHOLDER_LOGGING_VERBOSE="true"
 PLACEHOLDER_NEW_COMMIT_MESSAGE="#{issue_number.upcase}: #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
+GITHUB_SCRIPT_URL="https://raw.githubusercontent.com/yrave/prepare-commit-msg/master/scripts/prepare-commit-msg"
 
 PATH_GIT_GLOBAL="${HOME}/.git-template/"
 PATH_GIT_LOCAL="./.git/"
@@ -139,10 +141,14 @@ else
 	HOOK_FILE="${PATH_GIT_LOCAL}${HOOK_DIR}${HOOK_NAME}"
 fi
 
-printf -- " - Creating git hook file\n"
-
-BASEDIR=$(dirname $0)
-cat "${BASEDIR}/prepare-commit-msg" > "$HOOK_FILE"
+if [ "$should_use_file_from_github_url" = true ] ; then
+	printf -- " - Downloading git hook...\n"
+	curl -s "$GITHUB_SCRIPT_URL" > "$HOOK_FILE"
+else
+	printf -- " - Creating git hook file from local file\n"
+	BASEDIR=$(dirname $0)
+	cat "${BASEDIR}/prepare-commit-msg" > "$HOOK_FILE"
+fi
 
 printf -- " - Replacing placeholders...\n"
 PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=$(printf -- "$PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER" | sed 's/\\/\\\\/g')
