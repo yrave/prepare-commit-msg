@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 should_use_file_from_github_url=true
 # defaults
