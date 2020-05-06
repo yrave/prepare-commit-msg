@@ -2,7 +2,9 @@
 
 should_use_file_from_github_url=true
 # defaults
-PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER="^\s*[\-\w]*\d:"
+PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER="^\s*\[[\-\w]*\d\]"
+PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_ONE="^\s*\[[\-\w]*\d\]"
+PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_TWO="^\s*[\-\w]*\d:"
 PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER="[.]*\/([\-\w]*?\-\d+)"
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES="(Merge\sbranch\s\'|\#\sRebase\s|This\sreverts\scommit\s)"
 PLACEHOLDER_LOGGING_VERBOSE="true"
@@ -76,16 +78,28 @@ if [ "$answer" != "${answer#[Yy]}" ]; then
 		PLACEHOLDER_LOGGING_VERBOSE=false
 	fi
 
-	printf -- "Set a custom regex for parsing issue numbers from commit messages:\n"
-	printf -- " - To use default value, leave empty and press return\n\n"
-	printf -- "Default: ${BLUE}${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER}${RESET}\n${BLUE}>${RESET} "
+	printf -- "Set a custom regex for parsing issue numbers from commit messages:\n\n"
+	printf -- " - To use default value, leave empty and press return\n"
+	printf -- "Default: ${BLUE}${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER}${RESET}\n\n"
+	printf -- " - To use ${GREEN}[ISSUE_NUMBER] COMMIT_MESSAGE${RESET}, enter 1\n"
+	printf -- "1: ${BLUE}${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_ONE}${RESET}\n\n"
+	printf -- " - To use ${GREEN}ISSUE_NUMBER: COMMIT_MESSAGE${RESET}, enter 2\n"
+	printf -- "2: ${BLUE}${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_TWO}${RESET}\n\n${BLUE}>${RESET} "
 	read answer
 
 	if [ ! -z "$answer" ]; then
-		PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=answer
+		if [ "$answer" == "1" ]; then
+			PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=$PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_ONE
+		elif [ "$answer" == "2" ]; then
+			PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=$PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_TWO
+		else
+			PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER=answer
+		fi
 	fi
 
-	clear_n_lines 5
+	clear_n_lines 13
+	printf -- " - ${BLUE}Regex for commit message: ${PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER} ${RESET}\n\n"
+
 	printf -- "Set a custom regex for parsing issue numbers from branch names:\n"
 	printf -- " - To use default value, leave empty and press return\n\n"
 	printf -- "Default: ${BLUE}${PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER}${RESET}\n${BLUE}>${RESET} "
