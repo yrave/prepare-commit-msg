@@ -8,7 +8,9 @@ PLACEHOLDER_REGEX_COMMIT_ISSUE_NUMBER_TWO="^\s*[\-\w]*\d:"
 PLACEHOLDER_REGEX_BRANCH_ISSUE_NUMBER="[.]*\/([\-\w]*?\-\d+)"
 PLACEHOLDER_REGEX_GIT_COMMIT_MESSAGES="(Merge\sbranch\s\'|\#\sRebase\s|This\sreverts\scommit\s)"
 PLACEHOLDER_LOGGING_VERBOSE="true"
-PLACEHOLDER_NEW_COMMIT_MESSAGE="#{issue_number.upcase}: #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
+PLACEHOLDER_NEW_COMMIT_MESSAGE="[#{issue_number.upcase}] #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
+PLACEHOLDER_NEW_COMMIT_MESSAGE_ONE="[#{issue_number.upcase}] #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
+PLACEHOLDER_NEW_COMMIT_MESSAGE_TWO="#{issue_number.upcase}: #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
 GITHUB_SCRIPT_URL="https://raw.githubusercontent.com/janniks/prepare-commit-msg/master/scripts/prepare-commit-msg"
 
 PATH_GIT_GLOBAL="${HOME}/.git-template/"
@@ -77,6 +79,28 @@ if [ "$answer" != "${answer#[Yy]}" ]; then
 		printf -- " - ${BLUE}Disabling logging${RESET}\n\n"
 		PLACEHOLDER_LOGGING_VERBOSE=false
 	fi
+
+	printf -- "Set a custom message style where ISSUE_NUMBER is the issue number and COMMIT_MESSAGE is the commit message.\n"
+	printf -- " - To use default value, leave empty and press return\n"
+	printf -- "Default: ${BLUE}${PLACEHOLDER_NEW_COMMIT_MESSAGE}${RESET}\n\n"
+	printf -- " - To use ${GREEN}[ISSUE_NUMBER] COMMIT_MESSAGE${RESET}, enter 1\n"
+	printf -- "1: ${BLUE}${PLACEHOLDER_NEW_COMMIT_MESSAGE_ONE}${RESET}\n\n"
+	printf -- " - To use ${GREEN}ISSUE_NUMBER: COMMIT_MESSAGE${RESET}, enter 2\n"
+	printf -- "2: ${BLUE}${PLACEHOLDER_NEW_COMMIT_MESSAGE_TWO}${RESET}\n\n${BLUE}>${RESET} "
+	read answer
+
+	if [ ! -z "$answer" ]; then
+		if [ "$answer" == "1" ]; then
+			PLACEHOLDER_NEW_COMMIT_MESSAGE=$PLACEHOLDER_NEW_COMMIT_MESSAGE_ONE
+		elif [ "$answer" == "2" ]; then
+			PLACEHOLDER_NEW_COMMIT_MESSAGE=$PLACEHOLDER_NEW_COMMIT_MESSAGE_TWO
+		else
+			PLACEHOLDER_NEW_COMMIT_MESSAGE=answer
+		fi
+	fi
+
+	clear_n_lines 12
+	printf -- " - ${BLUE}Commit message style: ${PLACEHOLDER_NEW_COMMIT_MESSAGE} ${RESET}\n\n"
 
 	printf -- "Set a custom regex for parsing issue numbers from commit messages:\n\n"
 	printf -- " - To use default value, leave empty and press return\n"
