@@ -11,7 +11,7 @@ PLACEHOLDER_LOGGING_VERBOSE="true"
 PLACEHOLDER_NEW_COMMIT_MESSAGE="[#{issue_number.upcase}] #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
 PLACEHOLDER_NEW_COMMIT_MESSAGE_ONE="[#{issue_number.upcase}] #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
 PLACEHOLDER_NEW_COMMIT_MESSAGE_TWO="#{issue_number.upcase}: #{original_commit_message.gsub(/(\s[[:punct:]])+$/, '')}"
-GITHUB_SCRIPT_URL="https://raw.githubusercontent.com/janniks/prepare-commit-msg/master/scripts/prepare-commit-msg"
+GITHUB_SCRIPT_URL="https://raw.githubusercontent.com/yrave/prepare-commit-msg/master/scripts/prepare-commit-msg"
 
 PATH_GIT_GLOBAL="${HOME}/.git-template/"
 PATH_GIT_LOCAL="./.git/"
